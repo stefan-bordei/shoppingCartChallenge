@@ -67,7 +67,7 @@ class ShoppingCart(abc.ShoppingCart):
 
     def complete_transaction(self) -> None:
         """ Method used to updated the inventory once transaction is confirmed and trigger the shoppingcart cleanup. """
-        self.inventory.update_inventory(self.items)
+        self.inventory.reduce_inventory(self.items)
         self.__teardown()
 
     def __teardown(self):

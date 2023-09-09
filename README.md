@@ -9,9 +9,10 @@
 - I am able to use the python `unittest` library in order to create a Test class and write the unit tests
 - Products can be added to the cart only if the full quantity of the product is in stock
 - It is ok not to implement a lock on the products placed in a shopping cart (further improvements)
-- It is ok not to implement a cache for the shoppingcart (further improvements)
+- It is ok not to implement a session for the shoppingcart (further improvements)
 - It is ok to create simple classes for Inventory and Item and not Singletons (for the purpose of this challenge)
 - It is ok to hardcode the JSON schema without validating it and also the types (for the purpose of this challenge)
+- It is ok to hardcode the path to the JSON file. (for the purpose of this challenge)
 - The items price will have a base currency (EUR in this case) and all conversions will be done based on that
 
 ## Design
@@ -19,13 +20,14 @@
 Based on the assumptions listed above I have decided to create the following new classes.
 
 ### Inventory
-The Inventory class will contain all the products available in the store.
+The Inventory class will contain all the products available in the store and it will get them from a JSON file.
 The `ShoppingCart` will need to communicate with this object in order to check if an item is in stock before a customer can add it to the shopping cart.
 
 ### Item
 The Item class will contain all the information related to an item available in the inventory.
-The `Inventory` class will map the `product_code` to an instance of the product containing the quantity, value(price) and identifyer.
+The `Inventory` class will map the `product_code` to an instance of the product containing the quantity, price and identifyer.
 The Item class will provide a method to convert currency.
+The `__quantity` method currenlty represents the quantity of items in stock and not the ones in the shopping cart. (further improvements)
 
 # Shopping cart exercise brief
 

@@ -12,7 +12,7 @@ from . import abc
 #   if a product is not in stock or if the full quantity is not available the customer will not be able to add it top the cart
 # - The base currency si EUR, all conversions are done based on that
 class ShoppingCart(abc.ShoppingCart):
-    def __init__(self, inventory: Inventory=Inventory()):
+    def __init__(self, inventory: Inventory=Inventory('db/test_db_data.json')):
         # COMPLETED: keep items in order of insertion
         # Since python 3.6 dict() will keep the irder the items are inserted
         # Changed it to OrderedDict() so it would also cover python 3.6

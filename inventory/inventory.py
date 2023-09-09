@@ -1,6 +1,9 @@
 from typing import Dict
 from product.product import Item
 from common.consts import QUANTITY, PRICE
+import json
+import pathlib
+
 
 # TODO:
 # - The Inventory class will be used to get product information (like price) from an enternal source (JSON)
@@ -11,8 +14,10 @@ class Inventory:
     """
     Simple Inventory class used to store Item objects.
     """
-    def __init__(self, items: Dict[str, Item]={}):
-        self. __items = items
+    def __init__(self, db: str):
+        self. __db = db
+        self.__items = {}
+        self.update_inventory(self._fetch_db(db))
 
     @property
     def items(self):
@@ -21,6 +26,29 @@ class Inventory:
     @items.setter
     def items(self, key, val):
         self.__items[key] = val
+
+    @property
+    def db(self):
+        return self.__db
+
+    # TODO: Using a JSON file in order to get the data.
+    # For the purpose of this challenge I will not update the 'db' (JSON file in this case) when
+    # the transaction is completed.
+    # Further improvements:
+    #   - Use a DB connection in order to get the data
+    #   - Ensure all operations are atomic
+    #   - Stop creating the __items member as with a lot of data it can increase the memory usage
+
+    # Completed: Get data from external source
+    def _fetch_db(self, db: str='db/test_db_data.json') -> Dict:
+        """
+        Method that fetches data from a JSON file.
+        Current logic requires a path for the JSON file, this will need to be updated.
+        """
+        package_path = pathlib.Path(__file__).parent.parent.resolve()
+        file_to_open = f'{package_path}/{db}'
+        with open(file_to_open, 'r') as f:
+            return json.load(f)
 
     def update_inventory(self, products: Dict[str, Dict[str, int or float]]) -> None:
         for product_code, details in products.items():

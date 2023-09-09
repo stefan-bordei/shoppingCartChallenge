@@ -11,14 +11,16 @@ class ShoppingCartTestCase(unittest.TestCase):
         """ Setup method for ShoppingCartTestCases class. """
         current_path = pathlib.Path(__file__).parent.resolve()
         file_to_open = f'{current_path}/test_utils/test_inventory_data.json'
+        mock_db_path = 'tests/test_utils/test_inventory_data.json'
 
-        self.test_inventory = Inventory()
+
+        self.test_inventory = Inventory(mock_db_path)
 
         with open(file_to_open, 'r') as f:
             self.mock_data = json.load(f)
 
         print(self.mock_data)
-        self.test_inventory.update_inventory(self.mock_data)
+        #self.test_inventory.update_inventory(self.mock_data)
         self.sc = ShoppingCart(self.test_inventory)
 
     def test_add_item_pass(self):

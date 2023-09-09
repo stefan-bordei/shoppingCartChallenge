@@ -1,0 +1,14 @@
+{
+    "apples": {
+        "quantity": 5,
+        "value": 5.5
+    },
+    "bananas": {
+        "quantity": 10,
+        "value": 3.0
+    },
+    "kiwi": {
+        "quantity": 2,
+        "value": 10.0
+    }
+}

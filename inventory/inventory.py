@@ -17,7 +17,7 @@ class Inventory:
     def __init__(self, db: str):
         self. __db = db
         self.__items = {}
-        self.update_inventory(self._fetch_db(db))
+        self.update_inventory(self._fetch_db())
 
     @property
     def items(self):
@@ -40,17 +40,41 @@ class Inventory:
     #   - Stop creating the __items member as with a lot of data it can increase the memory usage
 
     # Completed: Get data from external source
-    def _fetch_db(self, db: str='db/test_db_data.json') -> Dict:
+    def _fetch_db(self) -> Dict:
         """
         Method that fetches data from a JSON file.
         Current logic requires a path for the JSON file, this will need to be updated.
         """
         package_path = pathlib.Path(__file__).parent.parent.resolve()
-        file_to_open = f'{package_path}/{db}'
-        with open(file_to_open, 'r') as f:
-            return json.load(f)
+        file_to_open = f'{package_path}/{self.db}'
+        try:
+            with open(file_to_open, 'r') as f:
+                return json.load(f)
+        except IOError:
+            return {}
+
+    def _update_db(self):
+        """ Simple Method to modify the JSON file in place to simulate updating the db. """
+        package_path = pathlib.Path(__file__).parent.parent.resolve()
+        file_to_open = f'{package_path}/{self.db}'
+        try:
+            with open(file_to_open, 'w') as f:
+                f.write(self._map_items_to_schema())
+        except IOError:
+            pass # needs update
+
+    def _map_items_to_schema(self) -> str:
+        """ Method to convert the dict schma to be dumped in the JSON file. """
+        # would be a good place to use dict comprehension
+        mapped_items = {}
+        for product_code, item in self.items.items():
+            mapped_items[product_code] = {}
+            mapped_items[product_code][QUANTITY] = item.quantity
+            mapped_items[product_code][PRICE] = item.price
+        return json.dumps(mapped_items)
 
     def update_inventory(self, products: Dict[str, Dict[str, int or float]]) -> None:
+        """ Method used to add items to the inventory. """
         for product_code, details in products.items():
             if product_code in self.items:
                 self.items[product_code].quantity += details.get(QUANTITY, 0)
@@ -60,12 +84,19 @@ class Inventory:
                                                 details.get(PRICE, 0.0)
                                                 )
 
-    def update_or_add_item(self, product_code: str, quantity: int, value: float) -> None:
+    def reduce_inventory(self, products: Dict[str, int]) -> None:
+        """ Method used to remove items from inventory if purchased. """
+        for product_code, quantity in products.items():
+            if product_code in self.items:
+                self.items[product_code].quantity -= quantity
+        self._update_db()
+
+    def update_or_add_item(self, product_code: str, quantity: int, price: float) -> None:
         # for the purpose of this challenge I am assuming that the value will always be the same for a specific product_code
         if product_code in self.items:
             self.items[product_code].quantity += quantity
         else:
-            self.items[product_code] = Item(product_code, quantity, value)
+            self.items[product_code] = Item(product_code, quantity, price)
 
     def remove_item(self, product_code: str, quantity: int) -> None:
         try:

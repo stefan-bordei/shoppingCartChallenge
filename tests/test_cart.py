@@ -6,6 +6,22 @@ from common.base import CONVERTER_CODE
 import pathlib
 
 
+MOCK_DB_DATA = {
+    "apples": {
+        "quantity": 5,
+        "price": 5.5
+    },
+    "bananas": {
+        "quantity": 10,
+        "price": 3.0
+    },
+    "kiwi": {
+        "quantity": 2,
+        "price": 10.0
+    }
+}
+
+
 class ShoppingCartTestCase(unittest.TestCase):
     def setUp(self):
         """ Setup method for ShoppingCartTestCases class. """
@@ -13,14 +29,15 @@ class ShoppingCartTestCase(unittest.TestCase):
         file_to_open = f'{current_path}/test_utils/test_inventory_data.json'
         mock_db_path = 'tests/test_utils/test_inventory_data.json'
 
+        # dump the json data in the 'db' JSON file
+        with open(file_to_open, 'w') as f:
+            f.write(json.dumps(MOCK_DB_DATA))
 
         self.test_inventory = Inventory(mock_db_path)
 
         with open(file_to_open, 'r') as f:
             self.mock_data = json.load(f)
 
-        print(self.mock_data)
-        #self.test_inventory.update_inventory(self.mock_data)
         self.sc = ShoppingCart(self.test_inventory)
 
     def test_add_item_pass(self):
@@ -65,6 +82,30 @@ class ShoppingCartTestCase(unittest.TestCase):
         self.sc.add_item(item, quantity)
 
         self.assertIn(f'Total: {CONVERTER_CODE.get_symbol(DEFAULT_CURRENCY.value)}{price*quantity:.2f}', self.sc.print_receipt())
+
+    def test_db_upate_pass(self):
+        """
+        Test if we have the total on the receipt.
+        This test will need to be modified as it modifies the JSON file inplace.
+        """
+
+        item = next(iter(self.mock_data))
+        quantity =  self.mock_data.get(item).get(QUANTITY)
+
+        self.sc.add_item(item, quantity)
+        self.sc.complete_transaction()
+
+        current_path = pathlib.Path(__file__).parent.resolve()
+        file_to_open = f'{current_path}/test_utils/test_inventory_data.json'
+
+        with open(file_to_open, 'r') as f:
+            mock_data = json.load(f)
+
+        new_item = next(iter(self.mock_data))
+        new_quantity =  mock_data.get(new_item).get(QUANTITY)
+
+        print(mock_data)
+        self.assertEqual(0, new_quantity)
 
 
 if __name__ == '__main__':

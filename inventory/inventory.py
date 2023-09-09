@@ -1,5 +1,6 @@
 from typing import Dict
 from product.product import Item
+from common.consts import QUANTITY, PRICE
 
 # TODO:
 # - The Inventory class will be used to get product information (like price) from an enternal source (JSON)
@@ -9,7 +10,6 @@ from product.product import Item
 class Inventory:
     """
     Simple Inventory class used to store Item objects.
-    This class will be used by ShoppingCart to check for product availability.
     """
     def __init__(self, items: Dict[str, Item]={}):
         self. __items = items
@@ -22,17 +22,36 @@ class Inventory:
     def items(self, key, val):
         self.__items[key] = val
 
-    def update_inventory(self, products) -> None:
-        pass
+    def update_inventory(self, products: Dict[str, Dict[str, int or float]]) -> None:
+        for product_code, details in products.items():
+            if product_code in self.items:
+                self.items[product_code].quantity += details.get(QUANTITY, 0)
+            else:
+                self.items[product_code] = Item(product_code,
+                                                details.get(QUANTITY, 0),
+                                                details.get(PRICE, 0.0)
+                                                )
 
     def update_or_add_item(self, product_code: str, quantity: int, value: float) -> None:
-        pass
+        # for the purpose of this challenge I am assuming that the value will always be the same for a specific product_code
+        if product_code in self.items:
+            self.items[product_code].quantity += quantity
+        else:
+            self.items[product_code] = Item(product_code, quantity, value)
 
     def remove_item(self, product_code: str, quantity: int) -> None:
-        pass
+        try:
+            self.items[product_code].quantity -= quantity
+        except KeyError:
+            print("This should not have happened.")
 
-    def get_item(self, item: str):
-        pass
+    def get_item(self, item: str) -> Item:
+        return self.items[item]
 
     def check_available_stock(self, product_code: str, quantity: int) -> bool:
-        pass
+        if product_code not in self.items:
+            return False
+        if self.items[product_code].quantity < quantity:
+            return False
+        return True
+

@@ -1,3 +1,7 @@
+from datetime import datetime
+from common.base import CONVERTER
+from common.consts import DEFAULT_CURRENCY, SupportedCurrencies
+
 
 # TODO:
 # - The Item class will store the product_code, quantity and value(price) members and will
@@ -28,9 +32,11 @@ class Item:
     def value(self) -> float:
         return self.__value
 
-    def get_price(self) -> float:
-        pass
+    def get_price(self, currency: SupportedCurrencies=SupportedCurrencies.EUR) -> float:
+        if currency != SupportedCurrencies.EUR:
+            return self._convert_currency(DEFAULT_CURRENCY, currency, self.value)
+        return self.value
 
-    def _convert_currency(self) -> float:
-        pass
+    def _convert_currency(self, current: SupportedCurrencies, desired: SupportedCurrencies, amount: float) -> float:
+        return float(CONVERTER.convert(current.value, desired.value, amount, datetime.now()))
 

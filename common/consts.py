@@ -24,4 +24,4 @@ DEFAULT_CURRENCY = SupportedCurrencies.EUR
 
 # Consts used to parse product data from JSON
 QUANTITY = 'quantity'
-VALUE =  'value'
+PRICE =  'price'
